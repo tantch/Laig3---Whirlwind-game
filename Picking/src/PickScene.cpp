@@ -46,53 +46,53 @@ void PickScene::init() {
 	glNormal3f(0, 0, 1);
 
 	obj = new ExampleObject();
-	board = new Board(10);
-	piece = new Piece(2,5.5,0.001,5.5);
+	board = new Board(14);
 	selector = new Selector();
+	pieces = new Pieces(50,14);
+	setUpdatePeriod(60);
 	materialAppearance = new CGFappearance();
 }
 
+void PickScene::update(unsigned long millis){
+	unsigned long timepassed=millis - lastTime;
+	unsigned long updps= 1000.0/timepassed;
+	lastTime=millis;
+	pieces->update(timepassed);
+
+}
 void PickScene::display() {
 
-	// ---- BEGIN Background, camera and axis setup
-
-	// Clear image and depth buffer everytime we update the scene
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Initialize Model-View matrix as identity (no transformation
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	// Apply transformations corresponding to the camera position relative to the origin
 	CGFscene::activeCamera->applyView();
 
-	// Draw (and update) light
 	light0->draw();
 
-	// Draw axis
 	axis.draw();
-
-	// ---- END Background, camera and axis setup
-
-	// ---- BEGIN feature demos
 
 	materialAppearance->apply();
 
 	// draw opaques
 	board->draw();
+	pieces->draw();
 
-	piece->draw();
 	//draw transperancys
 	selector->draw();
 
-	// ---- END feature demos
-
-	// glutSwapBuffers() will swap pointers so that the back buffer becomes the front buffer and vice-versa
 	glutSwapBuffers();
 }
-void PickScene::actionSelected(int i,int j){
-	selector->moveTo(i+0.5,0.001,j+0.5);
-
+void PickScene::boardSelected(int i, int j) {
+	if (pieces->isSelected()) {
+		pieces->moveSelectedTo(i, j);
+	} else {
+		selector->moveTo(i + 0.5, 0.001, j + 0.5);
+	}
+}
+void PickScene::pieceSelected(int id) {
+	pieces->select(id);
 }
 
 PickScene::~PickScene() {

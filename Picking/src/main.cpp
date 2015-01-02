@@ -8,7 +8,7 @@
 using std::cout;
 using std::exception;
 
-
+/*
 int main(int argc, char* argv[]) {
 
 	CGFapplication app = CGFapplication();
@@ -31,4 +31,4 @@ int main(int argc, char* argv[]) {
 	}
 
 	return 0;
-}
+}*/

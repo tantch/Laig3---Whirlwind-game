@@ -3,6 +3,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <ctype.h>
+#include <iostream>
 #include <string.h>	// for memcpy()...
 #include <stdlib.h>	// for atoi()...
 #include <unistd.h>	// for gethostname()...
@@ -56,9 +58,8 @@ void envia(char *s, int len) {
 			perror("Writing on stream socket");
 }
 
-void recebe(char *ans) {
-	read(sock,ans, sizeof (ans));
-	cout << "prolog answered: " << ans << endl;
+int recebe(char *ans) {
+	return read(sock,ans,1024);
 }
 
 void quit() {
@@ -69,15 +70,22 @@ void quit() {
 	char ans[128];
 	recebe(ans);
 }
-/*
+
 int main() {
 	socketConnect();
-	char *s = "comando(1, 2).\n";
-	envia(s, strlen(s));
-	char ans[128];
-	recebe(ans);
+	char buffer[1024];
+	memset(buffer, 0, 1024);
+
+	char* env="superSumo.\n";
+	envia(env,strlen(env));
+	sleep(2);
+	int r=recebe(buffer);
+	printf("read : %d\n",r);
+	string msg = buffer;
+	cout << "Received: " << msg << endl;
+
 	quit();
 	getchar();
 	close(sock);
 	return 0;
-}*/
+}

@@ -24,10 +24,11 @@ void Board::draw() {
 	square->apply();
 	glTranslatef(0.5, 0, 0.5);
 	glPushName(-1);
+	glLoadName(0);
 	for (int r = 0; r < size; r++) {
 		glPushMatrix();
 		glTranslatef(0, 0, r);
-		glLoadName(r);
+		glPushName(r);
 		for (int c = 0; c < size; c++) {
 			glPushMatrix();
 			glTranslatef(c, 0, 0);
@@ -37,6 +38,7 @@ void Board::draw() {
 			glPopName();
 			glPopMatrix();
 		}
+		glPopName();
 		glPopMatrix();
 	}
 	glPopName();

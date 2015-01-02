@@ -6,20 +6,18 @@
 #define BUFSIZE 256
 GLuint selectBuf[BUFSIZE];
 
-void PickInterface::processMouse(int button, int state, int x, int y) 
-{
-	CGFinterface::processMouse(button,state, x, y);
+void PickInterface::processMouse(int button, int state, int x, int y) {
+	CGFinterface::processMouse(button, state, x, y);
 
 	// do picking on mouse press (GLUT_DOWN)
 	// this could be more elaborate, e.g. only performing picking when there is a click (DOWN followed by UP) on the same place
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-		performPicking(x,y);
+		performPicking(x, y);
 }
 
-void PickInterface::performPicking(int x, int y) 
-{
+void PickInterface::performPicking(int x, int y) {
 	// Sets the buffer to be used for selection and activate selection mode
-	glSelectBuffer (BUFSIZE, selectBuf);
+	glSelectBuffer(BUFSIZE, selectBuf);
 	glRenderMode(GL_SELECT);
 
 	// Initialize the picking name stack
@@ -30,11 +28,11 @@ void PickInterface::performPicking(int x, int y)
 	glMatrixMode(GL_PROJECTION);
 
 	//store current projmatrix to restore easily in the end with a pop
-	glPushMatrix ();
+	glPushMatrix();
 
 	//get the actual projection matrix values on an array of our own to multiply with pick matrix later
 	GLfloat projmat[16];
-	glGetFloatv(GL_PROJECTION_MATRIX,projmat);
+	glGetFloatv(GL_PROJECTION_MATRIX, projmat);
 
 	// reset projection matrix
 	glLoadIdentity();
@@ -45,7 +43,8 @@ void PickInterface::performPicking(int x, int y)
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
 	// this is multiplied in the projection matrix
-	gluPickMatrix ((GLdouble) x, (GLdouble) (CGFapplication::height - y), 5.0, 5.0, viewport);
+	gluPickMatrix((GLdouble) x, (GLdouble) (CGFapplication::height - y), 5.0,
+			5.0, viewport);
 
 	// multiply the projection matrix stored in our array to ensure same conditions as in normal render
 	glMultMatrixf(projmat);
@@ -55,8 +54,8 @@ void PickInterface::performPicking(int x, int y)
 	scene->display();
 
 	// restore original projection matrix
-	glMatrixMode (GL_PROJECTION);
-	glPopMatrix ();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 
 	glFlush();
 
@@ -66,38 +65,44 @@ void PickInterface::performPicking(int x, int y)
 	processHits(hits, selectBuf);
 }
 
-void PickInterface::processHits (GLint hits, GLuint buffer[]) 
-{
+void PickInterface::processHits(GLint hits, GLuint buffer[]) {
 	GLuint *ptr = buffer;
 	GLuint mindepth = 0xFFFFFFFF;
-	GLuint *selected=NULL;
+	GLuint *selected = NULL;
 	GLuint nselected;
 
 	// iterate over the list of hits, and choosing the one closer to the viewer (lower depth)
-	for (int i=0;i<hits;i++) {
-		int num = *ptr; ptr++;
-		GLuint z1 = *ptr; ptr++;
+	for (int i = 0; i < hits; i++) {
+		int num = *ptr;
 		ptr++;
-		if (z1 < mindepth && num>0) {
+		GLuint z1 = *ptr;
+		ptr++;
+		ptr++;
+		if (z1 < mindepth && num > 0) {
 			mindepth = z1;
 			selected = ptr;
-			nselected=num;
+			nselected = num;
 		}
-		for (int j=0; j < num; j++) 
+		for (int j = 0; j < num; j++)
 			ptr++;
 	}
-	
+
 	// if there were hits, the one selected is in "selected", and it consist of nselected "names" (integer ID's)
-	if (selected!=NULL)
-	{
+	if (selected != NULL) {
+
 		// this should be replaced by code handling the picked object's ID's (stored in "selected"), 
 		// possibly invoking a method on the scene class and passing "selected" and "nselected"
-		printf("Picked ID's: ");
-		for (int i=0; i<nselected; i++)
-			printf("%d ",selected[i]);
-		printf("\n");
-		((PickScene*) scene)->actionSelected(selected[1],selected[0]);
-	}
-	else
-		printf("Nothing selected while picking \n");	
+
+		if (selected[0] == 0) { //place on board selected
+			printf("Picked ID's: ");
+			for (int i = 0; i < nselected; i++)
+				printf("%d ", selected[i]);
+			printf("\n");
+			((PickScene*) scene)->boardSelected(selected[2], selected[1]);
+		} else if (selected[0] == 1) { //pick piece
+			printf("piece %d selected \n",selected[1]);
+			((PickScene*) scene)->pieceSelected(selected[1]);
+		}
+	} else
+		printf("Nothing selected while picking \n");
 }

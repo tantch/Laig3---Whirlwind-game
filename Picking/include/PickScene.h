@@ -5,17 +5,20 @@
 #include "PickInterface.h"
 #include "Board.h"
 #include "Selector.h"
-#include "Piece.h"
+#include "Pieces.h"
 class PickScene : public CGFscene
 {
 	friend PickInterface;
 public:
 	void init();
 	void display();
-	void actionSelected(int i,int j);
+	void pieceSelected(int id);
+	void update(unsigned long millis);
+	void boardSelected(int i,int j);
 	~PickScene();
 private:
-	Piece* piece;
+	unsigned long lastTime;
+	Pieces* pieces;
 	CGFlight* light0;
 	Selector* selector;
 	Board* board;
