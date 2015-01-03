@@ -12,11 +12,14 @@ class PickScene : public CGFscene
 public:
 	void init();
 	void display();
+	void parseBoard();
 	void pieceSelected(int id);
 	void update(unsigned long millis);
 	void boardSelected(int i,int j);
 	~PickScene();
 private:
+	vector < vector<int> > rcvBoard;
+	string msg;
 	unsigned long lastTime;
 	Pieces* pieces;
 	CGFlight* light0;

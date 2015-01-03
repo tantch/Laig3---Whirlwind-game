@@ -50,13 +50,13 @@ void Piece::draw() {
 void Piece::print(){
 	cout<<"x: "<<this->x<<" y: "<<this->y<<" z: "<<this->z<<"\n";
 }
-Piece::Piece(int color, float x, float y, float z) {
+Piece::Piece(bool inBoard,int color, float x, float y, float z) {
 	this->x = x;
 	this->y = y;
 	this->z = z;
 	this->color = color;
 	this->picked = false;
-	this->inBoard = false;
+	this->inBoard = inBoard;
 	this->blocked=0;
 	float cor;
 	if (color == 1) {

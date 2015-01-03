@@ -1,16 +1,5 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <iostream>
-#include <string.h>	// for memcpy()...
-#include <stdlib.h>	// for atoi()...
-#include <unistd.h>	// for gethostname()...
-#include <ctype.h>	// for tolower()...
-#include <iostream>
 
+#include "sockt.h"
 #define IPADDRESS "127.0.0.1"
 #define PORT 60070
 #define BUFS	1024
@@ -70,7 +59,7 @@ void quit() {
 	char ans[128];
 	recebe(ans);
 }
-
+/*
 int main() {
 	socketConnect();
 	char buffer[1024];
@@ -88,4 +77,4 @@ int main() {
 	getchar();
 	close(sock);
 	return 0;
-}
+}*/

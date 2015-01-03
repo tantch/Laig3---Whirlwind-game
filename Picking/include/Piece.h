@@ -38,7 +38,7 @@ public:
 	void removeFromBoard();
 	void draw();
 	void moveTo(float x,float y,float z);
-	Piece(int color,float x,float y,float z);
+	Piece(bool inBoard,int color,float x,float y,float z);
 	virtual ~Piece();
 };
 

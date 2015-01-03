@@ -8,14 +8,13 @@
 using std::cout;
 using std::exception;
 
-/*
+
 int main(int argc, char* argv[]) {
 
 	CGFapplication app = CGFapplication();
 
 	try {
 		app.init(&argc, argv);
-
 		app.setScene(new PickScene());
 		app.setInterface(new PickInterface());
 		
@@ -31,4 +30,4 @@ int main(int argc, char* argv[]) {
 	}
 
 	return 0;
-}*/
+}

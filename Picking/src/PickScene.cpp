@@ -7,10 +7,39 @@
 #include <math.h>
 
 #include "CGFappearance.h"
-
+#include "sockt.h"
 #define NUM_OBJS 7
 #define NUM_ROWS 5
 #define NUM_COLS 4
+void PickScene::parseBoard() {
+	bool finished = false;
+	string temp;
+	string rest = msg;
+	while (!finished) {
+		int f = rest.find("[");
+		int r = rest.find("]");
+
+		temp = rest.substr(f + 1, r - 1);
+		if (r + 1 != rest.size()) {
+			printf("here r= %d  size= %d\n",r,rest.size());
+			rest = rest.substr(r + 2, rest.size());
+		} else {
+			finished = true;
+		}
+		//cout << "temp : " << temp << endl;
+		//cout << "rest : " << rest << endl;
+
+		vector<int> cords;
+		for (int i = 0; i < temp.size(); i++) {
+			if (temp[i] != ',') {
+				cords.push_back(temp[i]);
+			}
+		}
+			this->rcvBoard.push_back(cords);
+
+	}
+
+}
 
 void PickScene::init() {
 	// normal init, no changes needed
@@ -21,6 +50,18 @@ void PickScene::init() {
 	// Sets up some lighting parameters
 
 	// Declares and enables a light
+	socketConnect();
+	char buffer[1024];
+	memset(buffer, 0, 1024);
+
+	char* env = "board(14).\n";
+	envia(env, strlen(env));
+	int r = recebe(buffer);
+	printf("read : %d\n", r);
+	msg = buffer;
+	cout << "Received: " << msg << endl;
+	msg = msg.substr(1, msg.find(".") - 2);
+	parseBoard();
 	float light0_pos[4] = { 4.0, 6.0, 5.0, 1.0 };
 	light0 = new CGFlight(GL_LIGHT0, light0_pos);
 	light0->enable();
@@ -46,17 +87,17 @@ void PickScene::init() {
 	glNormal3f(0, 0, 1);
 
 	obj = new ExampleObject();
-	board = new Board(14);
+	board = new Board(this->rcvBoard.size());
 	selector = new Selector();
-	pieces = new Pieces(50,14);
+	pieces = new Pieces(this->rcvBoard.size()*this->rcvBoard.size()/3, this->rcvBoard.size(),this->rcvBoard);
 	setUpdatePeriod(60);
 	materialAppearance = new CGFappearance();
 }
 
-void PickScene::update(unsigned long millis){
-	unsigned long timepassed=millis - lastTime;
-	unsigned long updps= 1000.0/timepassed;
-	lastTime=millis;
+void PickScene::update(unsigned long millis) {
+	unsigned long timepassed = millis - lastTime;
+	unsigned long updps = 1000.0 / timepassed;
+	lastTime = millis;
 	pieces->update(timepassed);
 
 }
