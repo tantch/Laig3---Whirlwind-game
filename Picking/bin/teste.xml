@@ -1,0 +1,100 @@
+<anf>
+
+	<globals>
+
+		<drawing mode="fill" shading="gouraud" background="0 0 0.1 1" />
+
+
+		<culling face="back" order="ccw" />
+
+
+		<lighting doublesided="true" local="true" enabled="true"
+			ambient="0 0 0 1" />
+
+	</globals>
+
+
+	<cameras initial="cam1">
+
+
+		<perspective id="cam1" near="0.1" far="100.0" angle="45.0"
+			pos="-5 10 -5" target="0 0 0" />
+		
+	</cameras>
+
+
+
+	<lights>
+
+		<light id="luz4" type="omni" enabled="true" marker="false" pos="-3 30 -3">
+			<component type="ambient" value="0.1 0.1 0.1 1" />
+			<component type="diffuse" value="1 1 1 1" />
+			<component type="specular" value="1 1 1 1" />
+
+		</light>
+		<light id="lamp2" type="spot" enabled="true" marker="false"
+			pos="37 1.5 34" target="38 1.5 34" angle="45" exponent="10">
+			<component type="ambient" value="0.1 0.1 0.1 1" />
+			<component type="diffuse" value="0.9 0.5 0.1 1" />
+			<component type="specular" value="0.9 0.5 0.1 1" />
+
+		</light>
+
+
+	</lights>
+
+
+	<textures>
+		
+	</textures>
+
+
+	<appearances>
+
+		<appearance id="general" shininess="0.5" textureref="">
+			<component type="ambient" value="0.4 0.4 0.4 1" />
+			<component type="diffuse" value="0.6 0.6 0.6 1" />
+			<component type="specular" value="0.6 0.6 0.6 1" />
+		</appearance>
+		<appearance id="red" shininess="0.5" textureref="">
+			<component type="ambient" value="0.4 0 0 1" />
+			<component type="diffuse" value="0.6 0 0 1" />
+			<component type="specular" value="0.6 0 0 1" />
+		</appearance>
+	</appearances>
+
+
+
+	<graph rootid="cena">
+		<animations>
+			<animation id="rot" span="10" type="circular" center="0 0 0"
+				radius="10" startang="0" rotang="-360" />
+			<animation id="trans" span="20" type="linear">
+				<controlpoint xx="0" yy="10" zz="0" />
+				<controlpoint xx="0" yy="0" zz="0" />
+				<controlpoint xx="0" yy="10" zz="0" />
+				<controlpoint xx="0" yy="0" zz="0" />
+				<controlpoint xx="0" yy="10" zz="0" />
+				<controlpoint xx="0" yy="0" zz="0" />
+				<controlpoint xx="0" yy="10" zz="0" />
+				<controlpoint xx="0" yy="0" zz="0" />
+			</animation>
+
+
+		</animations>
+
+
+		<node id="cena">
+
+			<transforms>
+			</transforms>
+			<appearanceref id="general" />
+			<primitives>
+
+			</primitives>
+			<descendants>
+
+			</descendants>
+		</node>
+	</graph>
+</anf>

@@ -3,7 +3,8 @@
 
 #include "CGFapplication.h"
 #include "PickScene.h"
-#include "PickInterface.h"
+
+#include "Interface.h"
 
 using std::cout;
 using std::exception;
@@ -16,7 +17,7 @@ int main(int argc, char* argv[]) {
 	try {
 		app.init(&argc, argv);
 		app.setScene(new PickScene());
-		app.setInterface(new PickInterface());
+		app.setInterface(new Interface());
 		
 		app.run();
 	}

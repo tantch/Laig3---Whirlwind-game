@@ -7,6 +7,7 @@
 #include "CGFscene.h"
 #include <unistd.h>
 #include <math.h>
+#include "dataStructs.h"
 #include "CGFapplication.h"
 #include "CGFappearance.h"
 #include "CGFshader.h"

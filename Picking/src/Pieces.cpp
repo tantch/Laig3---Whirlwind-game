@@ -7,26 +7,70 @@
 
 #include "Pieces.h"
 #include  <signal.h>
-Pieces::Pieces(int num,int boardSize,vector< vector<int> > board) {
+Pieces::Pieces(int num, int boardSize, vector<vector<int> > board) {
 	for (int i = 0; i < num; i++) {
-		pieces.push_back(new Piece(false,1, boardSize +1 + ((i/25)*1), ((i/5)%5)*0.3, (i%5)+0.5+boardSize/2-2.5));
-		pieces.push_back(new Piece(false,0, -1 - ((i/25)*1), ((i/5)%5)*0.3, (i%5)+0.5+boardSize/2-2.5));
+		pieces.push_back(
+				new Piece(false, 1, boardSize + 1 + ((i / 25) * 1),
+						((i / 5) % 5) * 0.3,
+						(i % 5) + 0.5 + boardSize / 2 - 2.5));
+		pieces.push_back(
+				new Piece(false, 0, -1 - ((i / 25) * 1), ((i / 5) % 5) * 0.3,
+						(i % 5) + 0.5 + boardSize / 2 - 2.5));
 
 	}
-	for(unsigned int i=0;i< board.size();i++){
-		for(unsigned int j=0;j<board[i].size();j++){
-			if(board[i][j]!='0'){
-				pieces.push_back(new Piece(true,board[i][j]-49, i+0.5, 0.001,j+0.5));
+	for (unsigned int i = 0; i < board.size(); i++) {
+		for (unsigned int j = 0; j < board[i].size(); j++) {
+			if (board[i][j] != '0') {
+				pieces.push_back(
+						new Piece(true, board[i][j] - 49, i + 0.5, 0.001,
+								j + 0.5));
 			}
 		}
 	}
-	this->selectedPiece= -1;
+	this->selectedPiece = -1;
 }
-void Pieces::moveSelectedTo(int i,int j){
-	pieces[selectedPiece]->moveTo(i+0.5,0.001,j+0.5);
+vector<float> Pieces::moveFreePieceTo(int color, int i, int j) {
+	int id = -1;
+	int r = 0;
+	while (id == -1 && r < pieces.size()) {
+		if (!pieces[r]->isInBoard() && pieces[r]->getColor() == color) {
+			id = r;
+		}
+
+		r++;
+	}
+	if (id == -1) {
+		cout << "no piece left to use \n";
+	}
+	vector<float> ret;
+	ret.push_back(id);
+	ret.push_back(pieces[id]->getX());
+	ret.push_back(pieces[id]->getY());
+	ret.push_back(pieces[id]->getZ());
+	pieces[id]->moveTo(i + 0.5, 0.001, j + 0.5);
+	pieces[id]->placeInBoard();
+	ret.push_back(i);
+	ret.push_back(j);
+	return ret;
+
+}
+void Pieces::undoMove(int id, float x, float y, float z) {
+	pieces[id]->moveTo(x, y, z);
+	pieces[id]->removeFromBoard();
+}
+vector<float> Pieces::moveSelectedTo(int i, int j) {
+	vector<float> ret;
+	pieces[selectedPiece]->moveTo(i + 0.5, 0.001, j + 0.5);
 	pieces[selectedPiece]->unpick();
 	pieces[selectedPiece]->placeInBoard();
-	selectedPiece=-1;
+	ret.push_back(selectedPiece);
+	ret.push_back(pieces[selectedPiece]->getX());
+	ret.push_back(pieces[selectedPiece]->getY());
+	ret.push_back(pieces[selectedPiece]->getZ());
+	ret.push_back(i);
+	ret.push_back(j);
+	selectedPiece = -1;
+	return ret;
 }
 
 void Pieces::draw() {
@@ -40,23 +84,22 @@ void Pieces::draw() {
 	glPopName();
 
 }
-void Pieces::select(int id){
-	if(pieces[id]->isInBoard()){
+void Pieces::select(int id) {
+	if (pieces[id]->isInBoard()) {
 		block(id);
 		return;
 	}
-	if(selectedPiece != -1){
+	if (selectedPiece != -1) {
 		pieces[selectedPiece]->unpick();
 	}
-	this->selectedPiece= id;
+	this->selectedPiece = id;
 	pieces[selectedPiece]->pick();
 	return;
 }
-bool Pieces::isSelected(){
-	if(selectedPiece==-1){
+bool Pieces::isSelected() {
+	if (selectedPiece == -1) {
 		return false;
-	}
-	else{
+	} else {
 		return true;
 	}
 }
@@ -65,16 +108,16 @@ Pieces::~Pieces() {
 	// TODO Auto-generated destructor stub
 }
 
-void Pieces::block(int id){
+void Pieces::block(int id) {
 	pieces[id]->block();
 	blocks.push_back(id);
 }
-void Pieces::unblock(int id){
+void Pieces::unblock(int id) {
 	pieces[id]->unblock();
 
 }
-void Pieces::update(unsigned long millis){
-	for(int i=0;i<pieces.size();i++){
+void Pieces::update(unsigned long millis) {
+	for (int i = 0; i < pieces.size(); i++) {
 		pieces[i]->update(millis);
 	}
 }

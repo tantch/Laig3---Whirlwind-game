@@ -16,13 +16,15 @@ class Pieces {
 
 public:
 	Pieces(int num,int boardSize,vector< vector<int> > board);
-	void moveSelectedTo(int i,int j);
+	vector<float> moveSelectedTo(int i,int j);
 	void block(int id );
 	void unblock(int id);
 	void update(unsigned long millis);
 	void draw();
 	void select(int id);
 	bool isSelected();
+	void undoMove(int id,float x,float y,float z);
+	vector<float> moveFreePieceTo(int color,int i,int j);
 	virtual ~Pieces();
 };
 

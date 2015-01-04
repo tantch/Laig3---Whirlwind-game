@@ -82,6 +82,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.334664399" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.435774969" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.include.paths.545501542" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="../include/tiny"/>
 									<listOptionValue builtIn="false" value="../include/CGF"/>
 									<listOptionValue builtIn="false" value="../include"/>
 								</option>
@@ -97,6 +98,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1919110819" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.277858662" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option id="gnu.cpp.link.option.libs.1133084936" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="tiny"/>
 									<listOptionValue builtIn="false" value="CGF"/>
 									<listOptionValue builtIn="false" value="glui"/>
 									<listOptionValue builtIn="false" value="GL"/>
@@ -133,8 +135,13 @@
 		<project id="CGFExample.cdt.managedbuild.target.gnu.mingw.exe.1509047389" name="Executable" projectType="cdt.managedbuild.target.gnu.mingw.exe"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-	<storageModule moduleId="refreshScope" versionNumber="1">
-		<resource resourceType="PROJECT" workspacePath="/CGFExample"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="DebugWin">
+			<resource resourceType="PROJECT" workspacePath="/CGFExample"/>
+		</configuration>
+		<configuration configurationName="DebugLinux">
+			<resource resourceType="PROJECT" workspacePath="/CGFExample"/>
+		</configuration>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>

@@ -8,9 +8,17 @@
 #include "Piece.h"
 using namespace std;
 void Piece::moveTo(float x, float y, float z) {
-	this->x = x;
-	this->y = y;
-	this->z = z;
+	moving=500;
+	ori[0]=this->x;
+	ori[1]=this->y;
+	ori[2]=this->z;
+	dest[0]=x;
+	dest[1]=y;
+	dest[2]=z;
+	for(int i=0;i<3;i++){
+		vel[i]=dest[i]-ori[i];
+	}
+
 }
 void Piece::draw() {
 	glPushMatrix();
@@ -58,6 +66,14 @@ Piece::Piece(bool inBoard,int color, float x, float y, float z) {
 	this->picked = false;
 	this->inBoard = inBoard;
 	this->blocked=0;
+	moving=0;
+	for(int i=0;i<3;i++){
+		ori[i]=0;
+		vel[i]=0;
+	}
+	dest[0]=x;
+	dest[1]=y;
+	dest[2]=z;
 	float cor;
 	if (color == 1) {
 		cor = 0.3;
@@ -71,7 +87,18 @@ Piece::Piece(bool inBoard,int color, float x, float y, float z) {
 	this->material = new CGFappearance(amb, dif, spec, 60);
 
 }
-
+int Piece::getColor(){
+	return color;
+}
+float Piece::getX(){
+	return x;
+}
+float Piece::getY(){
+	return y;
+}
+float Piece::getZ(){
+	return z;
+}
 Piece::~Piece() {
 	// TODO Auto-generated destructor stub
 }
@@ -131,7 +158,7 @@ void Piece::unblock() {
 }
 void Piece::update(unsigned long millis){
 	if(blocked <= 0){
-		return;
+
 	}
 	else{
 		blocked-=millis;
@@ -139,4 +166,16 @@ void Piece::update(unsigned long millis){
 			unblock();
 		}
 	}
+	if(moving>0){
+		this->x+=vel[0]*(millis/500.0);
+		this->y+=vel[1]*(millis/500.0);
+		this->z+=vel[2]*(millis/500.0);
+		moving-=millis;
+	}else{
+		this->x=dest[0];
+		this->y=dest[1];
+		this->z=dest[2];
+		this->moving=0;
+	}
+
 }

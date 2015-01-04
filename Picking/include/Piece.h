@@ -22,13 +22,22 @@
 class Piece {
 	bool inBoard;
 	bool picked;
+	int moving;
+	float dest[3];
+	float ori[3];
+	float vel[3];
 	int blocked;
 	float x,y,z;
 	CGFappearance* material;
 	int color;
 public:
 	void block();
+
 	void print();
+	int getColor();
+	float getX();
+	float getY();
+	float getZ();
 	void update(unsigned long millis);
 	void unblock();
 	bool isInBoard();
