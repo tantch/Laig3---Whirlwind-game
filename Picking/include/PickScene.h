@@ -26,6 +26,7 @@ public:
 	void pieceSelected(int id);
 	void update(unsigned long millis);
 	void boardSelected(int i, int j);
+	void changePlayer();
 	~PickScene();
 
 	TiXmlElement* anfElement;
@@ -47,9 +48,11 @@ public:
 	vector<string> camerasId;
 	AnimationMp* animationsV;
 	int rotating;
+	int currentPlayer=1;
 	float rot;
 	int activeCam = 0;
 	int drawMode = 0;
+	int movesMade=0;
 	string msg;
 	vector<vector<float> > history;
 	vector<vector<int> > rcvBoard;

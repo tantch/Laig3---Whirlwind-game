@@ -73,7 +73,8 @@ void Interface::initGUI() {
 	addColumnToPanel(general);
 
 	GLUI_Panel *undoPanel = addPanelToPanel(general, "Undo", 1);
-	GLUI_Button *undo = addButtonToPanel(undoPanel, "undo", 13);
+	GLUI_Button *undo = addButtonToPanel(undoPanel, "Undo", 13);
+	GLUI_Button *changePlayer = addButtonToPanel(undoPanel, "Finish Turn", 14);
 
 }
 
@@ -83,9 +84,9 @@ void Interface::processGUI(GLUI_Control *ctrl) {
 	if (ctrl->user_id >= 0) {
 		if (ctrl->user_id == 13) {
 			((PickScene*) scene)->undo();
-		} else
-
-		if (ctrl->get_int_val() == 1) {
+		} else if(ctrl->user_id==14){
+			((PickScene*) scene)->changePlayer();
+		}else if (ctrl->get_int_val() == 1) {
 			((PickScene*) scene)->activateLight(ctrl->user_id, true);
 		} else {
 			((PickScene*) scene)->activateLight(ctrl->user_id, false);

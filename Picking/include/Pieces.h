@@ -21,7 +21,7 @@ public:
 	void unblock(int id);
 	void update(unsigned long millis);
 	void draw();
-	void select(int id);
+	void select(int id,int pl);
 	bool isSelected();
 	void undoMove(int id,float x,float y,float z);
 	vector<float> moveFreePieceTo(int color,int i,int j);

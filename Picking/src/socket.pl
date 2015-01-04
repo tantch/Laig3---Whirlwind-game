@@ -256,52 +256,34 @@ camposVazios([],0-0,F,B,P),!,
 length(B,T),
 chooseAi(X-Y,F,B,P,T),!,
 write(X-Y),nl.
-treatInput(B,X-Y,P-M):-
-length(B,T),
-integer(X),
-integer(Y),
-X<T,
-Y<T,
-isEmpty(X-Y,B),
-placePc(X-Y,P,B,Br),
-validateMove(X-Y,Br,P),!,
-changeColor(P,P1),
-cycle(Br,P1-M,1).
-treatInput(B,_,P-M):-
-P=:=1,
-M =\=3,
-write('Invalid input'),nl,!,
-cycle(B,P-M,1);
-P=:=2,
-M =:= 1,
-write('Invalid input'),nl,!,
-cycle(B,P-M,1);
-cycle(B,P-M,2).
-treatInput(B,X1-Y1,X2-Y2,P-M):-
-length(B,T),
-integer(X1),
-integer(Y1),
-integer(X2),
-integer(Y2),
-X1<T,Y1<T,X2<T,Y2<T,
-isEmpty(X1-Y1,B),
-placePc(X1-Y1,P,B,Br),
-isEmpty(X2-Y2,Br),
-placePc(X2-Y2,P,Br,Bf),
-validateMove(X1-Y1,Bf,P),
-validateMove(X2-Y2,Bf,P),
-changeColor(P,P1),
-cycle(Bf,P1-M,1).
-treatInput(B,_,_,P-M):-
-P=:=1,
-M =\=3,!,
-write('Invalid input'),nl,
-cycle(B,P-M,1);
-P=:=2,
-M =:= 1,!,
-write('Invalid input'),nl,
-cycle(B,P-M,1);
-cycle(B,P-M,2).
+
+treatInput(B,X-Y,P,Br,1):-
+        length(B,T),
+        integer(X),
+        integer(Y),
+        X<T,
+        Y<T,
+        isEmpty(X-Y,B),
+        placePc(X-Y,P,B,Br),
+        validateMove(X-Y,Br,P).
+treatInput(B,_,_,B,0).
+
+treatInput(B,X1-Y1,X2-Y2,P,Bf,1):-
+        length(B,T),
+        integer(X1),
+        integer(Y1),
+        integer(X2),
+        integer(Y2),
+        X1<T,Y1<T,X2<T,Y2<T,
+        isEmpty(X1-Y1,B),
+        placePc(X1-Y1,P,B,Br),
+        isEmpty(X2-Y2,Br),
+        placePc(X2-Y2,P,Br,Bf),
+        validateMove(X1-Y1,Bf,P),
+        validateMove(X2-Y2,Bf,P).
+treatInput(B,_,_,_,B,0).
+
+
 treatInputType(B,X,P-M):-
 integer(X),
 X>0,

@@ -166,7 +166,6 @@ void PickScene::display() {
 		it->second->light->update();
 	}
 	float trans= rcvBoard.size()/2;
-	cout<<trans<<endl;
 	glRotatef(rot, 0, 1, 0);
 	glTranslatef(-trans -0.5,0,-trans -0.5);
 
@@ -186,21 +185,40 @@ void PickScene::display() {
 void PickScene::boardSelected(int i, int j) {
 	if (pieces->isSelected()) {
 		history.push_back(pieces->moveSelectedTo(i, j));
+		movesMade++;
 	} else {
 		selector->moveTo(i + 0.5, 0.001, j + 0.5);
 	}
 }
+void PickScene::changePlayer(){
+	if(movesMade==0){
+		return;
+	}
+	if(currentPlayer==1){
+		currentPlayer=2;
+	}
+	else{
+		currentPlayer=1;
+	}
+	movesMade=0;
+	rotating=1000;
+}
 void PickScene::undo() {
-	if (history.size() == 0) {
-		rotating=1000;
+	if (history.size() == 0 || movesMade==0) {
+
 		return;
 	}
 	vector<float> move = history[history.size() - 1];
 	history.pop_back();
 	pieces->undoMove(move[0], move[1], move[2], move[3]);
+	movesMade--;
 }
 void PickScene::pieceSelected(int id) {
-	pieces->select(id);
+	if(movesMade==2){
+		pieces->block(id);
+		return;
+	}
+	pieces->select(id,currentPlayer);
 }
 void PickScene::startAnf(char* filename) {
 	TiXmlDocument* doc = new TiXmlDocument(filename);

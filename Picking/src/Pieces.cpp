@@ -84,8 +84,8 @@ void Pieces::draw() {
 	glPopName();
 
 }
-void Pieces::select(int id) {
-	if (pieces[id]->isInBoard()) {
+void Pieces::select(int id,int pl) {
+	if (pieces[id]->isInBoard() || pieces[id]->getColor()==pl-1) {
 		block(id);
 		return;
 	}
