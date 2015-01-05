@@ -27,12 +27,14 @@ class Piece {
 	float ori[3];
 	float vel[3];
 	int blocked;
+	float tkcl[3];
 	float x,y,z;
 	CGFappearance* material;
 	int color;
 public:
+	void setTk(float i,float j,float k);
 	void block();
-
+	bool isMoving();
 	void print();
 	int getColor();
 	float getX();

@@ -17,6 +17,7 @@ class Pieces {
 public:
 	Pieces(int num,int boardSize,vector< vector<int> > board);
 	vector<float> moveSelectedTo(int i,int j);
+	void setTk(float i,float j,float k);
 	void block(int id );
 	void unblock(int id);
 	void update(unsigned long millis);
@@ -26,6 +27,7 @@ public:
 	void undoMove(int id,float x,float y,float z);
 	vector<float> moveFreePieceTo(int color,int i,int j);
 	virtual ~Pieces();
+	bool moving();
 };
 
 #endif /* SRC_PIECES_H_ */

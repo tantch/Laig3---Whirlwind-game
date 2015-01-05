@@ -11,6 +11,7 @@
 class Board {
 	int size;
 	CGFappearance* square;
+	CGFappearance* tubes;
 	Plane* plane;
 public:
 	Board(int size);

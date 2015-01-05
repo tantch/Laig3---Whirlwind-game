@@ -9,12 +9,13 @@
 #include  <signal.h>
 Pieces::Pieces(int num, int boardSize, vector<vector<int> > board) {
 	for (int i = 0; i < num; i++) {
+
 		pieces.push_back(
-				new Piece(false, 1, boardSize + 1 + ((i / 25) * 1),
+				new Piece(false, 1, boardSize + 2 + ((i / 25) * 1),
 						((i / 5) % 5) * 0.3,
 						(i % 5) + 0.5 + boardSize / 2 - 2.5));
 		pieces.push_back(
-				new Piece(false, 0, -1 - ((i / 25) * 1), ((i / 5) % 5) * 0.3,
+				new Piece(false, 0, -2 - ((i / 25) * 1), ((i / 5) % 5) * 0.3,
 						(i % 5) + 0.5 + boardSize / 2 - 2.5));
 
 	}
@@ -28,6 +29,11 @@ Pieces::Pieces(int num, int boardSize, vector<vector<int> > board) {
 		}
 	}
 	this->selectedPiece = -1;
+}
+void Pieces::setTk(float i,float j,float k){
+	for(int i=0;i<pieces.size();i++){
+			pieces[i]->setTk(i,j,k);
+		}
 }
 vector<float> Pieces::moveFreePieceTo(int color, int i, int j) {
 	int id = -1;
@@ -53,6 +59,14 @@ vector<float> Pieces::moveFreePieceTo(int color, int i, int j) {
 	ret.push_back(j);
 	return ret;
 
+}
+bool Pieces::moving(){
+
+	for(int i=0;i<pieces.size();i++){
+		if(pieces[i]->isMoving())
+			return true;
+	}
+	return false;
 }
 void Pieces::undoMove(int id, float x, float y, float z) {
 	pieces[id]->moveTo(x, y, z);

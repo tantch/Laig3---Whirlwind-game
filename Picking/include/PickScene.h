@@ -4,6 +4,7 @@
 #include "CGFscene.h"
 #include "Interface.h"
 #include "Board.h"
+#include <sstream>
 #include "Selector.h"
 #include "Pieces.h"
 #include "tinyxml.h"
@@ -27,8 +28,13 @@ public:
 	void update(unsigned long millis);
 	void boardSelected(int i, int j);
 	void changePlayer();
+	void writeWin();
+	void setGameMode(int m);
+	void setTk(int n);
 	~PickScene();
-
+	bool won;
+	int prevSize;
+	int size;
 	TiXmlElement* anfElement;
 	TiXmlElement* globalElements;
 	TiXmlElement* cameraElements;
@@ -48,8 +54,10 @@ public:
 	vector<string> camerasId;
 	AnimationMp* animationsV;
 	int rotating;
+	int gameMode;
 	int currentPlayer=1;
 	float rot;
+	int dif;
 	int activeCam = 0;
 	int drawMode = 0;
 	int movesMade=0;

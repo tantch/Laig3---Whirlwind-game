@@ -43,7 +43,9 @@ void PickScene::parseBoard() {
 
 void PickScene::init() {
 	rotating = 0;
-	rot=0;
+	rot = 0;
+	won = false;
+	gameMode = 1;
 	// normal init, no changes needed
 
 	// Enables lighting computations
@@ -126,16 +128,65 @@ void PickScene::update(unsigned long millis) {
 	unsigned long updps = 1000.0 / timepassed;
 	lastTime = millis;
 	pieces->update(timepassed);
+	if (!pieces->moving() && won==0 && rotating == 0 && (movesMade == 0 || movesMade == 1)
+			&& (gameMode == 3 || (gameMode == 2 && currentPlayer == 2))) {
+		char buffer[1024];
+		memset(buffer, 0, 1024);
+		stringstream rnd;
+		rnd << "rnd(" << currentPlayer << ").\n";
+		cout << "enviado: " << rnd.str() << endl;
+		envia((char*) rnd.str().c_str(), strlen(rnd.str().c_str()));
+		int r = recebe(buffer);
+		string recv = buffer;
+		cout << "received: " << recv << endl;
+		string xt= recv.substr(0,recv.find('-'));
+		stringstream ss(xt);
+			int x;
+			ss >> x;
+		cout<<"x: "<<x<<endl;
+		string yt= recv.substr(recv.find('-')+1,recv.find('.')-2);
+		stringstream ss2(yt);
+					int y;
+					ss2 >> y;
+		cout<<"y: "<<y<<endl;
+		int cor;
+		if (currentPlayer == 1) {
+						cor = 1;
+					} else {
+						cor = 0;
+					}
+		pieces->moveFreePieceTo(cor,x,y);
+		movesMade++;
+		if (movesMade == 2) {
+			if (currentPlayer == 1) {
+				currentPlayer = 2;
+			} else {
+				currentPlayer = 1;
+			}
+			movesMade = 0;
+			rotating = 1000;
+			stringstream ganho;
+			ganho << "win(" << currentPlayer << ").\n";
+			cout << "enviado: " << ganho.str() << endl;
+			envia((char*) ganho.str().c_str(), strlen(ganho.str().c_str()));
+
+			r = recebe(buffer);
+			string recebido = buffer;
+			cout << "recebido :" << recebido << endl;
+			if (recebido == "1.\n") {
+				won = true;
+				return;
+			}
+		}
+	}
 	if (rotating > 0) {
 
 		rot += 180 * (timepassed / 1000.0);
-		rotating-=timepassed;
-		cout<<rot<<endl;
-	}
-	else{
-		int rest=rot/180;
-		rot=rest*180;
-		rotating=0;
+		rotating -= timepassed;
+	} else {
+		int rest = rot / 180;
+		rot = rest * 180;
+		rotating = 0;
 	}
 }
 void PickScene::display() {
@@ -165,18 +216,19 @@ void PickScene::display() {
 		}
 		it->second->light->update();
 	}
-	float trans= rcvBoard.size()/2;
-	glRotatef(rot, 0, 1, 0);
-	glTranslatef(-trans -0.5,0,-trans -0.5);
-
-	graph->draw(appearances->appearances.end());
-
+	float trans = rcvBoard.size() / 2;
 	materialAppearance->apply();
+	glRotatef(rot, 0, 1, 0);
+	glTranslatef(-trans - 0.5, 0, -trans - 0.5);
+	graph->draw(appearances->appearances.end());
 
 	// draw opaques
 	board->draw();
 	pieces->draw();
 
+	if (won) {
+		writeWin();
+	}
 	//draw transperancys
 	selector->draw();
 
@@ -190,35 +242,134 @@ void PickScene::boardSelected(int i, int j) {
 		selector->moveTo(i + 0.5, 0.001, j + 0.5);
 	}
 }
-void PickScene::changePlayer(){
-	if(movesMade==0){
+void PickScene::changePlayer() {
+	if (movesMade == 0) {
 		return;
 	}
-	if(currentPlayer==1){
-		currentPlayer=2;
+	char buffer[1024];
+	memset(buffer, 0, 1024);
+	stringstream validar;
+	if (movesMade == 1) {
+		vector<float> move1 = history[history.size() - 1];
+
+		validar << "validate(" << move1[5] << "," << move1[4] << ","
+				<< currentPlayer << ").\n";
+	} else {
+		vector<float> move1 = history[history.size() - 2];
+		vector<float> move2 = history[history.size() - 1];
+
+		validar << "validate(" << move1[5] << "," << move1[4] << "," << move2[5]
+				<< "," << move2[4] << "," << currentPlayer << ").\n";
 	}
-	else{
-		currentPlayer=1;
+	cout << "enviado: " << validar.str() << endl;
+	envia((char*) validar.str().c_str(), strlen(validar.str().c_str()));
+	int r = recebe(buffer);
+	string recebido = buffer;
+	cout << "recebido :" << recebido << endl;
+	if (recebido == "0.\n") {
+		undo();
+		return;
 	}
-	movesMade=0;
-	rotating=1000;
+	stringstream ganho;
+	ganho << "win(" << currentPlayer << ").\n";
+	cout << "enviado: " << ganho.str() << endl;
+	envia((char*) ganho.str().c_str(), strlen(ganho.str().c_str()));
+
+	r = recebe(buffer);
+	recebido = buffer;
+	cout << "recebido :" << recebido << endl;
+	if (recebido == "1.\n") {
+		won = true;
+		return;
+	}
+	if (currentPlayer == 1) {
+		currentPlayer = 2;
+	} else {
+		currentPlayer = 1;
+	}
+	movesMade = 0;
+	rotating = 1000;
 }
 void PickScene::undo() {
-	if (history.size() == 0 || movesMade==0) {
+	if (history.size() == 0 || movesMade == 0) {
 
 		return;
 	}
+
 	vector<float> move = history[history.size() - 1];
 	history.pop_back();
 	pieces->undoMove(move[0], move[1], move[2], move[3]);
 	movesMade--;
 }
+void PickScene::setGameMode(int m) {
+	gameMode = m;
+	rotating = 0;
+	movesMade = 0;
+	rot = 0;
+	won = 0;
+	currentPlayer = 1;
+	history.clear();
+	int boardSize = 14;
+	char buffer[1024];
+	memset(buffer, 0, 1024);
+	stringstream reset;
+	reset << "reset(" << size << ").\n";
+	cout << "enviado: " << reset.str() << endl;
+	envia((char*) reset.str().c_str(), strlen(reset.str().c_str()));
+	int r = recebe(buffer);
+	printf("readen : %d\n", r);
+	msg = buffer;
+	rcvBoard.clear();
+	cout << "Received: " << msg << endl;
+	msg = msg.substr(1, msg.find(".") - 2);
+	parseBoard();
+	pieces = new Pieces(this->rcvBoard.size() * this->rcvBoard.size() / 3,
+			this->rcvBoard.size(), this->rcvBoard);
+	board = new Board(this->rcvBoard.size());
+
+}
+void PickScene::setTk(int n){
+	switch(n){
+	case 0:
+		pieces->setTk(0,0,0);
+		break;
+	case 1:
+		pieces->setTk(1,0,0);
+		break;
+	case 2:
+		pieces->setTk(0,1,0);
+		break;
+	case 3:
+		pieces->setTk(0,0,1);
+		break;
+	}
+}
+void PickScene::writeWin() {
+	string win = "You win";
+	glPushMatrix();
+	glTranslatef(rcvBoard.size() / 2, 9, rcvBoard.size() / 2 + 5);
+	glRotatef(90, 0, 1, 0);
+	for (int i = 0; i < 7; i++) {
+		glPushMatrix();
+		if (i == 6)
+			glTranslatef(1.5 * i - 1, 0, 0);
+		else
+			glTranslatef(1.5 * i, 0, 0);
+		glScalef(0.02, 0.02, 0.02);
+		glColor3f(0.5, 0.5, 1.0); // azul
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, win[i]);
+		glPopMatrix();
+	}
+	glPopMatrix();
+
+}
 void PickScene::pieceSelected(int id) {
-	if(movesMade==2){
+	if (movesMade == 2 || (gameMode == 2 && currentPlayer == 2)
+			|| gameMode == 3) {
 		pieces->block(id);
 		return;
 	}
-	pieces->select(id,currentPlayer);
+	pieces->select(id, currentPlayer);
 }
 void PickScene::startAnf(char* filename) {
 	TiXmlDocument* doc = new TiXmlDocument(filename);

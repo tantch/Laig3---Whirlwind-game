@@ -72,9 +72,28 @@ void Interface::initGUI() {
 	addRadioButtonToGroup(drawList, "Point");
 	addColumnToPanel(general);
 
-	GLUI_Panel *undoPanel = addPanelToPanel(general, "Undo", 1);
+	GLUI_Panel *undoPanel = addPanelToPanel(general, "Game", 1);
 	GLUI_Button *undo = addButtonToPanel(undoPanel, "Undo", 13);
 	GLUI_Button *changePlayer = addButtonToPanel(undoPanel, "Finish Turn", 14);
+	GLUI_Listbox *appList = addListboxToPanel(undoPanel,"Styles",0,20);
+			appList->add_item(0,"0");
+			appList->add_item(1,"1");
+			appList->add_item(2,"2");
+			appList->add_item(3,"3");
+	addColumnToPanel(general);
+
+	GLUI_Panel *resetPanel = addPanelToPanel(general, "New Game", 1);
+	GLUI_Button *pvp = addButtonToPanel(resetPanel, "Pl vs PL", 15);
+	GLUI_Button *pvc = addButtonToPanel(resetPanel, "PL vs CP", 16);
+	GLUI_Button *cvc = addButtonToPanel(resetPanel, "CP vs CP", 17);
+	GLUI_Spinner *boardSize = addSpinnerToPanel(resetPanel, "size", 2,
+			&((PickScene*) scene)->size, 19);
+	((PickScene*) scene)->size = 14;
+	((PickScene*) scene)->prevSize = 14;
+	GLUI_RadioGroup *difList = addRadioGroupToPanel(resetPanel,
+				&((PickScene*) scene)->dif);
+		addRadioButtonToGroup(difList, "Easy");
+		addRadioButtonToGroup(difList, "Hard");
 
 }
 
@@ -84,9 +103,29 @@ void Interface::processGUI(GLUI_Control *ctrl) {
 	if (ctrl->user_id >= 0) {
 		if (ctrl->user_id == 13) {
 			((PickScene*) scene)->undo();
-		} else if(ctrl->user_id==14){
+		} else if (ctrl->user_id == 14) {
 			((PickScene*) scene)->changePlayer();
-		}else if (ctrl->get_int_val() == 1) {
+		} else if (ctrl->user_id == 15) {
+			((PickScene*) scene)->setGameMode(1);
+		} else if (ctrl->user_id == 16) {
+			((PickScene*) scene)->setGameMode(2);
+		}else if (ctrl->user_id == 17) {
+			((PickScene*) scene)->setGameMode(3);
+		}  else if (ctrl->user_id == 20) {
+			((PickScene*) scene)->setTk(ctrl->int_val);
+		} else if (ctrl->user_id == 19) {
+			if (((PickScene*) scene)->size < 14) {
+				((PickScene*) scene)->size = 14;
+			} else if (((PickScene*) scene)->size > 20) {
+				((PickScene*) scene)->size = 20;
+			} else if (((PickScene*) scene)->size % 2 != 0) {
+				if (((PickScene*) scene)->size > ((PickScene*) scene)->prevSize)
+					((PickScene*) scene)->size++;
+				else
+					((PickScene*) scene)->size--;
+			}
+			((PickScene*) scene)->prevSize = ((PickScene*) scene)->size;
+		} else if (ctrl->get_int_val() == 1) {
 			((PickScene*) scene)->activateLight(ctrl->user_id, true);
 		} else {
 			((PickScene*) scene)->activateLight(ctrl->user_id, false);
@@ -100,57 +139,57 @@ GLuint selectBuf[BUFSIZE];
 void Interface::processMouse(int button, int state, int x, int y) {
 	CGFinterface::processMouse(button, state, x, y);
 
-	// do picking on mouse press (GLUT_DOWN)
-	// this could be more elaborate, e.g. only performing picking when there is a click (DOWN followed by UP) on the same place
+// do picking on mouse press (GLUT_DOWN)
+// this could be more elaborate, e.g. only performing picking when there is a click (DOWN followed by UP) on the same place
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		performPicking(x, y);
 }
 
 void Interface::performPicking(int x, int y) {
-	// Sets the buffer to be used for selection and activate selection mode
+// Sets the buffer to be used for selection and activate selection mode
 	glSelectBuffer(BUFSIZE, selectBuf);
 	glRenderMode(GL_SELECT);
 
-	// Initialize the picking name stack
+// Initialize the picking name stack
 	glInitNames();
 
-	// The process of picking manipulates the projection matrix
-	// so we will be activating, saving and manipulating it
+// The process of picking manipulates the projection matrix
+// so we will be activating, saving and manipulating it
 	glMatrixMode(GL_PROJECTION);
 
-	//store current projmatrix to restore easily in the end with a pop
+//store current projmatrix to restore easily in the end with a pop
 	glPushMatrix();
 
-	//get the actual projection matrix values on an array of our own to multiply with pick matrix later
+//get the actual projection matrix values on an array of our own to multiply with pick matrix later
 	GLfloat projmat[16];
 	glGetFloatv(GL_PROJECTION_MATRIX, projmat);
 
-	// reset projection matrix
+// reset projection matrix
 	glLoadIdentity();
 
-	// get current viewport and use it as reference for
-	// setting a small picking window of 5x5 pixels around mouse coordinates for picking
+// get current viewport and use it as reference for
+// setting a small picking window of 5x5 pixels around mouse coordinates for picking
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
-	// this is multiplied in the projection matrix
+// this is multiplied in the projection matrix
 	gluPickMatrix((GLdouble) x, (GLdouble) (CGFapplication::height - y), 5.0,
 			5.0, viewport);
 
-	// multiply the projection matrix stored in our array to ensure same conditions as in normal render
+// multiply the projection matrix stored in our array to ensure same conditions as in normal render
 	glMultMatrixf(projmat);
 
-	// force scene drawing under this mode
-	// only the names of objects that fall in the 5x5 window will actually be stored in the buffer
+// force scene drawing under this mode
+// only the names of objects that fall in the 5x5 window will actually be stored in the buffer
 	scene->display();
 
-	// restore original projection matrix
+// restore original projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 
 	glFlush();
 
-	// revert to render mode, get the picking results and process them
+// revert to render mode, get the picking results and process them
 	GLint hits;
 	hits = glRenderMode(GL_RENDER);
 	processHits(hits, selectBuf);
@@ -162,7 +201,7 @@ void Interface::processHits(GLint hits, GLuint buffer[]) {
 	GLuint *selected = NULL;
 	GLuint nselected;
 
-	// iterate over the list of hits, and choosing the one closer to the viewer (lower depth)
+// iterate over the list of hits, and choosing the one closer to the viewer (lower depth)
 	for (int i = 0; i < hits; i++) {
 		int num = *ptr;
 		ptr++;
@@ -178,7 +217,7 @@ void Interface::processHits(GLint hits, GLuint buffer[]) {
 			ptr++;
 	}
 
-	// if there were hits, the one selected is in "selected", and it consist of nselected "names" (integer ID's)
+// if there were hits, the one selected is in "selected", and it consist of nselected "names" (integer ID's)
 	if (selected != NULL) {
 
 		// this should be replaced by code handling the picked object's ID's (stored in "selected"),

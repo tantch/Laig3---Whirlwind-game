@@ -22,15 +22,37 @@ server:-
 	socket_server_close(Socket).
 
 % wait for commands
-serverLoop(Stream,B) :-
-        read(Stream,ClientMsg),
+serverLoop(Stream,B) :-!,
+        printBoard(B),!,
+        read(Stream,ClientMsg),!,
         write('Received: '),write(ClientMsg),nl,
-        parse_input(ClientMsg,Answer),
-	format(Stream, '~q.~n',[Answer]),
-	flush_output(Stream),
-        (serverLoop(Stream,B);
+        parse_input(ClientMsg,Answer,B,Br),!,
+	format(Stream, '~q.~n',[Answer]),!,
+        write('Sent: '),write(Answer),nl,
+	flush_output(Stream),!,
+        (serverLoop(Stream,Br),!;
 	ClientMsg == quit; ClientMsg == end_of_file), !.
 
+
+parse_input(rnd(P),X-Y,B,Br):-
+        changeColor(P,Pf),
+        readComputerRandomInput(X-Y,B,Pf),
+        treatInput(B,X-Y,Pf,Br,1).
+parse_input(reset(Ar),Bf,_,Bf):-
+        board(Ar,Bf).
+parse_input(validate(X,Y,P),Ans,B,Br):-
+        changeColor(P,Pf),
+        treatInput(B,X-Y,Pf,Br,Ans).
+parse_input(validate(X,Y,X2,Y2,P),Ans,B,Br):-
+         changeColor(P,Pf),
+        treatInput(B,X-Y,X2-Y2,Pf,Br,Ans).
+parse_input(win(1),1,B,B):-
+        winBlack(B).
+parse_input(win(1),0,B,B).
+parse_input(win(2),1,B,B):-
+        winWhite(B).
+parse_input(win(2),0,B,B).
+        
 parse_input(board(Arg1),Arg1).
 parse_input(comando(Arg1, Arg2), Answer) :-
 	comando(Arg1, Arg2, Answer).
@@ -404,3 +426,79 @@ H=:= 1,
 printBoard(B),
 askInputType(B,P-M);
 askInputType(B,P-M).
+
+printElement(0,'+').
+printElement(1,'W').
+printElement(2,'B').
+printLine([X|Xs],H,T):-
+H < T-1,
+H1 is H+1,
+printElement(X,Y),
+write(Y),
+write('---'),
+printLine(Xs,H1,T).
+printLine([X|_],H,T):-
+T1 is T -1,
+H >= T1,
+printElement(X,Y),
+write(Y).
+printHorDash(H,T):-
+H<T,
+write('| '),
+H1 is H+1,
+printHorDash(H1,T).
+printHorDash(T,T).
+printTopNumbers(H,T):-
+H<10,!,
+write(' '),write(H),write(' '),
+H1 is H+1,
+printTopNumbers(H1,T);
+H<T,
+write(H),write(' '),
+H1 is H+1,
+printTopNumbers(H1,T).
+printTopNumbers(T,T).
+printBoard(B):-
+length(B,T),
+write(' '),
+printTopNumbers(0,T),nl,
+write(' black\n'),
+printBoard(B,0,T),
+write(' '),
+printTopNumbers(0,T),nl,
+write(' black\n').
+printBoard([X|Bs],H,T):-
+T1 is T/2,
+T2 is T1 -1,
+H >T2,
+H =< T1,
+H1 is H+1,
+write('white '),
+printLine(X,0,T),
+write(' '),
+write(H),
+write(' white'),
+write('\n'),
+write(' '),
+printHorDash(0,T),nl,
+printBoard(Bs,H1,T).
+printBoard([X|Bs],H,T):-
+T1 is T-1,
+H<T1,
+H1 is H+1,
+write(' '),
+printLine(X,0,T),
+write(' '),
+write(H),
+write('\n'),
+write(' '),
+printHorDash(0,T),nl,
+printBoard(Bs,H1,T).
+printBoard([X|_],H,T):-
+T1 is T-2,
+H>T1,
+write(' '),
+printLine(X,0,T),
+write(' '),
+write(H),
+write('\n').
